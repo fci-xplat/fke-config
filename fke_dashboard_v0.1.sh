@@ -58,6 +58,12 @@ warning_kubeconfig()
     echo -e "  - Sao chep file Kubeconfig vao may tinh va chay lenh: export KUBECONFIG=/duong/dan/file/kubeconfig\n"
 }
 
+warning_dashboard()
+{
+    echo -e "\nDe truy cap vao dashboard: \n  - Chay lenh: kubectl proxy \n  - Truy cap vao duong dan: http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/#!/login"
+    echo "  - De login vao dashboard, ban can khoi tao token/kubeconfig"
+}
+
 fke_dashboard()
 {
     echo -e "Nhap phien ban Dashboard can cai dat (default: v2.6.1)\nThong tin cac phien ban tham khao: https://github.com/kubernetes/dashboard"
@@ -66,6 +72,7 @@ fke_dashboard()
         kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.6.1/aio/deploy/recommended.yaml
         if [ $? -eq 0 ]; then
             echo -e "\nCai dat K8s dashboard phien ban v2.6.1 thanh cong.\n"
+            warning_dashboard
         else
             echo -e "\nCai dat K8s dashboard phien ban v2.6.1 that bai.\n"
         fi
@@ -73,12 +80,11 @@ fke_dashboard()
         kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/$dashboard_version/aio/deploy/recommended.yaml
         if [ $? -eq 0 ]; then
             echo -e "\nCai dat K8s dashboard phien ban $dashboard_version thanh cong.\n"
+            warning_dashboard
         else
             echo -e "\nCai dat K8s dashboard phien ban $dashboard_version that bai.\n"
         fi
     fi
-    echo -e "\nDe truy cap vao dashboard: \n  - Chay lenh: kubectl proxy \n  - Truy cap vao duong dan: http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/#!/login"
-    echo "  - De login vao dashboard, ban can khoi tao token/kubeconfig"
 }
 
 fke_kubeconfig()
@@ -98,33 +104,60 @@ fke_kubeconfig()
 
 fke_helm()
 {
-    echo "  - Ban co muon cai dat helm khong? (yes/no)"
+    echo "  - Ban co muon cai dat bang helm khong? (yes/no)"
     read option_helm
-    if [ "$option_helm" == "yes" ] || [ "$option_helm" == "y" ]; then
+    if [ $option_helm == "yes" ] || [ $option_helm == "y" ]; then
         curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
         chmod 700 get_helm.sh && ./get_helm.sh
+        helm_enable="true"
         if [ $? -eq 0 ]; then
             echo -e "\n  - Cai dat helm thanh cong.\n"
         else
             echo -e "\n  - Cai dat helm that bai.\n"
         fi
     else
-        exit
+        helm_enable="false"
     fi
+}
+
+ingress_example()
+{
+    echo -e "\n  - Vi du cau hinh Nginx Ingress: \n"
+    echo -e "  Them annotations: kubernetes.io/ingress.class: "nginx" de su dung) \n"
+    echo "apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: public-dashboard
+  annotations:
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+    kubernetes.io/ingress.class: "nginx"
+  namespace: kube-system
+spec:
+  rules:
+  - host: dashboard.example_domain
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: kubernetes-dashboard
+            port:
+              number: 443"
 }
 
 fke_ingress()
 {
     fke_helm
-    if [ $target_ingress = "nginx" ]; then
+    if [ $target_ingress = "nginx" ] && [ $helm_enable = "true" ]; then
         helm repo add nginx-stable https://helm.nginx.com/stable && helm repo update
         helm install nginx-ingress nginx-stable/nginx-ingress --set rbac.create=true
         kubectl get pods --all-namespaces -l app=nginx-ingress-nginx-ingress
-        if [ $? -eq 0 ]; then
-            echo -e "\n  - Cai dat nginx ingress thanh cong.\n"
-        else
-            echo -e "\n  - Cai dat nginx ingress that bai.\n"
-        fi
+        ingress_example
+    elif [ $target_ingress = "nginx" ] && [ $helm_enable = "false" ]; then
+        kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.4.0/deploy/static/provider/cloud/deploy.yaml
+        kubectl get pods -n ingress-nginx
+        ingress_example
     elif [ $target_ingress = "haproxy" ]; then
         echo "haproxy"
     else
