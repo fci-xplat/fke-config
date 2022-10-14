@@ -33,7 +33,7 @@ ingress_menu() {
     # echo "  3) Nhap 3 de cai dat haproxy ingress"
     # echo "  4) Nhap 3 de cai dat traefik ingress"
     # echo "  5) Nhap 3 de cai dat istio ingress"
-    echo "  6) Nhap 6 to Exit"
+    echo "  6) Nhap 4 to Exit"
     echo -n "Nhap lua chon cua ban: "
     read option_ingress
     echo ""
