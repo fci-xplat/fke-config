@@ -58,21 +58,67 @@ warning_kubeconfig()
     echo -e "  - Sao chep file Kubeconfig vao may tinh va chay lenh: export KUBECONFIG=/duong/dan/file/kubeconfig\n"
 }
 
-warning_dashboard()
+check_cluster()
 {
-    echo -e "\nDe truy cap vao dashboard: \n  - Chay lenh: kubectl proxy \n  - Truy cap vao duong dan: http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/#!/login"
-    echo "  - De login vao dashboard, ban can khoi tao token/kubeconfig"
+    kubectl cluster-info >/dev/null
+    if [ $? -eq 0 ]; then
+        echo ""
+    else
+        echo -e "  - Ban chua ket noi duoc toi cum K8s: Kiem tra ket noi mang hoac cau hinh: export KUBECONFIG=/duong/dan/file/kubeconfig\n"
+    fi
+}
+
+
+fke_kubectl()
+{
+    kubectl version --client >/dev/null 2>&1
+    if [ $? -eq 0 ]; then
+        echo ""
+    else
+        echo -e "\nkubectl chua duoc cai dat. Ban co muon cai dat kubectl khong? (yes/no)\n"
+        read option_kubectl
+        if [ "$option_kubectl" == "yes" ] || [ "$option_kubectl" == "y" ]; then
+            echo -e "Nhap phien ban kubectl can cai dat (default: $(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt) )\nThong tin cac phien ban tham khao: https://kubernetes.io/vi/docs/tasks/tools/install-kubectl/"
+            read kubectl_version
+                if [ -z "$kubectl_version" ]; then
+                    curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl >/dev/null
+                    chmod +x ./kubectl
+                    sudo mv ./kubectl /usr/local/bin/kubectl
+                    kubectl version --client >/dev/null 2>&1
+                    if [ $? -eq 0 ]; then
+                        echo -e "\nCai dat kubectl phien ban $(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt) thanh cong.\n"
+                    else
+                        echo -e "\nCai dat kubectl phien ban $(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt) that bai.\n"
+                    fi
+                else
+                    curl -LO https://storage.googleapis.com/kubernetes-release/release/$kubectl_version/bin/linux/amd64/kubectl >/dev/null
+                    chmod +x ./kubectl
+                    sudo mv ./kubectl /usr/local/bin/kubectl
+                    kubectl version --client >/dev/null 2>&1
+                    if [ $? -eq 0 ]; then
+                        echo -e "\nCai dat kubectl phien ban $kubectl_version thanh cong.\n"
+                    else
+                        echo -e "\nCai dat kubectl phien ban $kubectl_version that bai.\n"
+                    fi
+                fi
+
+        else
+            echo ""
+        fi
+    fi
+
 }
 
 fke_dashboard()
 {
+    fke_kubectl
+    check_cluster
     echo -e "Nhap phien ban Dashboard can cai dat (default: v2.6.1)\nThong tin cac phien ban tham khao: https://github.com/kubernetes/dashboard"
     read dashboard_version
     if [ -z "$dashboard_version" ]; then
         kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.6.1/aio/deploy/recommended.yaml
         if [ $? -eq 0 ]; then
             echo -e "\nCai dat K8s dashboard phien ban v2.6.1 thanh cong.\n"
-            warning_dashboard
         else
             echo -e "\nCai dat K8s dashboard phien ban v2.6.1 that bai.\n"
         fi
@@ -80,7 +126,8 @@ fke_dashboard()
         kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/$dashboard_version/aio/deploy/recommended.yaml
         if [ $? -eq 0 ]; then
             echo -e "\nCai dat K8s dashboard phien ban $dashboard_version thanh cong.\n"
-            warning_dashboard
+            echo -e "\nDe truy cap vao dashboard: \n  - Chay lenh: kubectl proxy \n  - Truy cap vao duong dan: http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/#!/login"
+            echo "  - De login vao dashboard, ban can khoi tao token/kubeconfig"
         else
             echo -e "\nCai dat K8s dashboard phien ban $dashboard_version that bai.\n"
         fi
@@ -89,6 +136,8 @@ fke_dashboard()
 
 fke_kubeconfig()
 {
+    fke_kubectl
+    check_cluster
     echo "  - Khoi tao service account: fke-admin"
     kubectl apply -f https://raw.githubusercontent.com/fci-xplat/fke-config/main/fke_sa_rbac.yml
     TOKENNAME=`kubectl -n kube-system get serviceaccount/fke-admin -o jsonpath='{.secrets[0].name}'`
@@ -104,64 +153,38 @@ fke_kubeconfig()
 
 fke_helm()
 {
-    echo "  - Ban co muon cai dat bang helm khong? (yes/no)"
+    echo "  - Ban co muon cai dat helm khong? (yes/no)"
     read option_helm
-    if [ $option_helm == "yes" ] || [ $option_helm == "y" ]; then
+    if [ "$option_helm" == "yes" ] || [ "$option_helm" == "y" ]; then
         curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
         chmod 700 get_helm.sh && ./get_helm.sh
-        helm_enable="true"
         if [ $? -eq 0 ]; then
             echo -e "\n  - Cai dat helm thanh cong.\n"
         else
             echo -e "\n  - Cai dat helm that bai.\n"
         fi
     else
-        helm_enable="false"
+        echo ""
     fi
-}
-
-ingress_example()
-{
-    echo -e "\n  - Vi du cau hinh Nginx Ingress: \n"
-    echo -e "  Them annotations: kubernetes.io/ingress.class: "nginx" de su dung) \n"
-    echo "apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: public-dashboard
-  annotations:
-    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
-    kubernetes.io/ingress.class: "nginx"
-  namespace: kube-system
-spec:
-  rules:
-  - host: dashboard.example_domain
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: kubernetes-dashboard
-            port:
-              number: 443"
 }
 
 fke_ingress()
 {
+    check_cluster
     fke_helm
-    if [ $target_ingress = "nginx" ] && [ $helm_enable = "true" ]; then
+    if [ $target_ingress = "nginx" ]; then
         helm repo add nginx-stable https://helm.nginx.com/stable && helm repo update
         helm install nginx-ingress nginx-stable/nginx-ingress --set rbac.create=true
         kubectl get pods --all-namespaces -l app=nginx-ingress-nginx-ingress
-        ingress_example
-    elif [ $target_ingress = "nginx" ] && [ $helm_enable = "false" ]; then
-        kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.4.0/deploy/static/provider/cloud/deploy.yaml
-        kubectl get pods -n ingress-nginx
-        ingress_example
+        if [ $? -eq 0 ]; then
+            echo -e "\n  - Cai dat nginx ingress thanh cong.\n"
+        else
+            echo -e "\n  - Cai dat nginx ingress that bai.\n"
+        fi
     elif [ $target_ingress = "haproxy" ]; then
         echo "haproxy"
     else
-        echo "exit"
+        exit
     fi
 
 }
