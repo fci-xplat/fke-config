@@ -9,7 +9,9 @@ else
      echo "Remove nvidia modules: "
      rmmod -f nvidia_uvm nvidia_drm nvidia_modeset nvidia
      if [ $? -eq 0 ] ; then
-          echo "All nvidia modules had been removed"
+          echo "All modules had been removed"
+     else
+          echo "Modules were not removed"
      fi
 fi
 #reset gpu
