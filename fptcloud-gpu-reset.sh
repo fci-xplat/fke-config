@@ -45,7 +45,7 @@ else
      nvidia-smi -i 0 -mig 1
 fi
 #reset result
-echo "=== GPU reset result==="
+echo "=== GPU reset result ==="
 echo "- GPU instances: " && nvidia-smi -L
 echo "- GPU processes are running: " && fuser -v /dev/nvidia* && ps -ef | grep nvidia
 if [[ -z "$(fuser -v /dev/nvidia*)" ]]; then echo "None process";fi
