@@ -20,10 +20,10 @@ else
      rmmod -f nvidia_uvm nvidia_drm nvidia_modeset nvidia
      if [ $? -eq 0 ] ; then
           echo "All modules had been removed"
-          module_status=successfull
+          module_status=removed
      else
           echo "Modules were not removed"
-          module_status=failed
+          module_status="not removed"
      fi
 fi
 #reset gpu
@@ -48,5 +48,8 @@ fi
 echo "=== GPU reset result==="
 echo "*GPU instances: " && nvidia-smi -L
 echo "*GPU processes are running: " && fuser -v /dev/nvidia* && ps -ef | grep nvidia
+if [[ -z "$(fuser -v /dev/nvidia*)" ]] &&  [[ -z "$(ps -ef | grep nvidia)" ]]; then
+     echo "None process"
+fi
 echo "*GPU remove modules: $module_status"
 echo "*GPU reset status: $reset_status"
