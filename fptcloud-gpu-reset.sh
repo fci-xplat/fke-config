@@ -46,10 +46,8 @@ else
 fi
 #reset result
 echo "=== GPU reset result==="
-echo "*GPU instances: " && nvidia-smi -L
-echo "*GPU processes are running: " && fuser -v /dev/nvidia* && ps -ef | grep nvidia
-if [[ -z "$(fuser -v /dev/nvidia*)" ]] &&  [[ -z "$(ps -ef | grep nvidia)" ]]; then
-     echo "None process"
-fi
-echo "*GPU remove modules: $module_status"
-echo "*GPU reset status: $reset_status"
+echo "- GPU instances: " && nvidia-smi -L
+echo "- GPU processes are running: " && fuser -v /dev/nvidia* && ps -ef | grep nvidia
+if [[ -z "$(fuser -v /dev/nvidia*)" ]]; then echo "None process";fi
+echo "- GPU remove modules: $module_status"
+echo "- GPU reset status: $reset_status"
