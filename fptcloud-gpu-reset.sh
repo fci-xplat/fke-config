@@ -37,7 +37,7 @@ else
      reset_status=failed
 fi
 #enable mig
-echo "*Enable mig: "
+echo "*Enable MIG: "
 mig_status=$(nvidia-smi -i 0 --query-gpu=mig.mode.current --format=csv,noheader)
 if [ $mig_status == "Enabled" ]; then
      echo "MIG is $mig_status"
@@ -51,3 +51,4 @@ echo "- GPU processes are running: " && fuser -v /dev/nvidia* && ps -ef | grep n
 if [[ -z "$(fuser -v /dev/nvidia*)" ]]; then echo "None process";fi
 echo "- GPU remove modules: $module_status"
 echo "- GPU reset status: $reset_status"
+echo "- GPU MIG status: $mig_status"
