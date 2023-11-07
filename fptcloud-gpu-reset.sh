@@ -52,3 +52,4 @@ if [[ -z "$(fuser -v /dev/nvidia*)" ]]; then echo "None process";fi
 echo "- GPU remove modules: $module_status"
 echo "- GPU reset status: $reset_status"
 echo "- GPU MIG status: $mig_status"
+echo "GPU reset process finished" && sleep infinity
