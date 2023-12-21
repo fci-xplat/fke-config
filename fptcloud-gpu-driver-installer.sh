@@ -125,7 +125,7 @@ verify_nvidia_installation() {
 
 main() {
   if check_cached_version; then
-    configure_cached_installation
+    #configure_cached_installation
     verify_nvidia_installation
   else
     download_kernel_src
