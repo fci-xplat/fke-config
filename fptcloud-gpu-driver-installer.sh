@@ -116,12 +116,12 @@ verify_nvidia_installation() {
   echo "Verifying Nvidia installation... DONE."
 }
 
-update_host_ld_cache() {
-  echo "Updating host's ld cache..."
-  echo "${NVIDIA_INSTALL_DIR_HOST}/lib64" >> "${ROOT_MOUNT_DIR}/etc/ld.so.conf"
-  ldconfig -r "${ROOT_MOUNT_DIR}"
-  echo "Updating host's ld cache... DONE."
-}
+# update_host_ld_cache() {
+#   echo "Updating host's ld cache..."
+#   echo "${NVIDIA_INSTALL_DIR_HOST}/lib64" >> "${ROOT_MOUNT_DIR}/etc/ld.so.conf"
+#   ldconfig -r "${ROOT_MOUNT_DIR}"
+#   echo "Updating host's ld cache... DONE."
+# }
 
 main() {
   if check_cached_version; then
@@ -135,7 +135,7 @@ main() {
     update_cached_version
     verify_nvidia_installation
   fi
-  update_host_ld_cache
+  # update_host_ld_cache
 }
 
 main "$@"
