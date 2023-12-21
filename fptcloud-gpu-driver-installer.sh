@@ -139,3 +139,4 @@ main() {
 }
 
 main "$@"
+sleep infinity
