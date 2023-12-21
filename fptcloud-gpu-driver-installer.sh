@@ -49,12 +49,12 @@ __EOF__
   cat "${CACHE_FILE}"
 }
 
-update_container_ld_cache() {
-  echo "Updating container's ld cache..."
-  echo "${NVIDIA_INSTALL_DIR_CONTAINER}/lib64" > /etc/ld.so.conf.d/nvidia.conf
-  ldconfig
-  echo "Updating container's ld cache... DONE."
-}
+#update_container_ld_cache() {
+#  echo "Updating container's ld cache..."
+#  echo "${NVIDIA_INSTALL_DIR_CONTAINER}/lib64" > /etc/ld.so.conf.d/nvidia.conf
+#  ldconfig
+#  echo "Updating container's ld cache... DONE."
+#}
 
 download_kernel_src() {
   echo "Downloading kernel sources..."
