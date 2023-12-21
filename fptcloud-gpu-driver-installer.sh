@@ -95,17 +95,17 @@ run_nvidia_installer() {
   echo "Running Nvidia installer... DONE."
 }
 
-configure_cached_installation() {
-  echo "Configuring cached driver installation..."
-#  update_container_ld_cache
-  if ! lsmod | grep -w 'nvidia' > /dev/null; then
-    insmod "${NVIDIA_INSTALL_DIR_CONTAINER}/drivers/nvidia.ko"
-  fi
-  if ! lsmod | grep -w 'nvidia_uvm' > /dev/null; then
-    insmod "${NVIDIA_INSTALL_DIR_CONTAINER}/drivers/nvidia-uvm.ko"
-  fi
-  echo "Configuring cached driver installation... DONE"
-}
+# configure_cached_installation() {
+#   echo "Configuring cached driver installation..."
+# #  update_container_ld_cache
+#   if ! lsmod | grep -w 'nvidia' > /dev/null; then
+#     insmod "${NVIDIA_INSTALL_DIR_CONTAINER}/drivers/nvidia.ko"
+#   fi
+#   if ! lsmod | grep -w 'nvidia_uvm' > /dev/null; then
+#     insmod "${NVIDIA_INSTALL_DIR_CONTAINER}/drivers/nvidia-uvm.ko"
+#   fi
+#   echo "Configuring cached driver installation... DONE"
+# }
 
 verify_nvidia_installation() {
   echo "Verifying Nvidia installation..."
