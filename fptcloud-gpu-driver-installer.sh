@@ -68,7 +68,7 @@ configure_nvidia_installation_dirs() {
   pushd "${NVIDIA_INSTALL_DIR_CONTAINER}"
 
   # Populate ld.so.conf to avoid warning messages in nvidia-installer logs.
-  update_container_ld_cache
+#  update_container_ld_cache
 
   # Install an exit handler to cleanup the overlayfs mount points.
   popd
@@ -97,7 +97,7 @@ run_nvidia_installer() {
 
 configure_cached_installation() {
   echo "Configuring cached driver installation..."
-  update_container_ld_cache
+#  update_container_ld_cache
   if ! lsmod | grep -w 'nvidia' > /dev/null; then
     insmod "${NVIDIA_INSTALL_DIR_CONTAINER}/drivers/nvidia.ko"
   fi
