@@ -116,6 +116,12 @@ verify_nvidia_installation() {
   echo "Verifying Nvidia installation... DONE."
 }
 
+clean_nvidia_installation() {
+  rm -rf ${NVIDIA_INSTALL_DIR_CONTAINER}/${NVIDIA_INSTALLER_RUNFILE} ${CACHE_FILE}
+  echo "Clean Nvidia installation... DONE."
+}
+
+
 # update_host_ld_cache() {
 #   echo "Updating host's ld cache..."
 #   echo "${NVIDIA_INSTALL_DIR_HOST}/lib64" >> "${ROOT_MOUNT_DIR}/etc/ld.so.conf"
@@ -135,6 +141,7 @@ main() {
     update_cached_version
     verify_nvidia_installation
   fi
+  clean_nvidia_installation
   # update_host_ld_cache
 }
 
