@@ -1,0 +1,61 @@
+# Copyright 2023 FPT Cloud - PaaS
+# worker.fptcloud/type=gpu
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: fptcloud-gpu-driver-installer
+  namespace: kube-system
+  labels:
+    k8s-app: gpu-driver
+spec:
+  selector:
+    matchLabels:
+      k8s-app: gpu-driver
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        name: nvidia-driver-installer
+        k8s-app: gpu-driver
+    spec:
+      priorityClassName: system-node-critical
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: worker.fptcloud/type
+                operator: In
+                values: ["gpu"]
+      tolerations:
+      - operator: "Exists"
+      containers:
+        - image: docker.io/alpine:3.13
+          name: nvidia-driver-installer
+          command:
+            - 'nsenter'
+            - '-t'
+            - '1'
+            - '-m'
+            - '-u'
+            - '-i'
+            - '-n'
+            - '--'
+            - 'bash'
+            - '-l'
+            - '-c'
+            - 'curl -Ls https://raw.githubusercontent.com/fci-xplat/fke-config/main/fptcloud-gpu-driver-installer.sh | bash -s -- -p admin'
+          resources:
+            requests:
+              cpu: 150m
+          env:
+          - name: NVIDIA_DRIVER_VERSION
+            value: "535.54.03"
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            privileged: true
+            allowPrivilegeEscalation: true
+      hostPID: true
+      hostNetwork: true
+      hostIPC: true
