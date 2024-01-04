@@ -17,6 +17,8 @@ NVIDIA_INSTALLER_RUNFILE="$(basename "${NVIDIA_DRIVER_DOWNLOAD_URL}")"
 ROOT_MOUNT_DIR="${ROOT_MOUNT_DIR:-/root}"
 CACHE_FILE="${NVIDIA_INSTALL_DIR_CONTAINER}/.cache"
 KERNEL_VERSION="$(uname -r)"
+NVIDIA_TOOLKIT_LIB_URL="https://nvidia.github.io/libnvidia-container/gpgkey"
+NVIDIA_TOOLKIT_DOWNLOAD_URL="https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list"
 set +x
 
 check_cached_version() {
@@ -121,6 +123,19 @@ clean_nvidia_installation() {
   echo "Clean Nvidia installation... DONE."
 }
 
+install_nvidia_toolkit() {
+  curl -fsSL ${NVIDIA_TOOLKIT_LIB_URL} | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
+  curl -s -L ${NVIDIA_TOOLKIT_DOWNLOAD_URL} |
+  sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' |
+  sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+  sudo apt-get update
+  sudo apt-get install -y nvidia-container-toolkit
+  sudo nvidia-ctk runtime configure --runtime=containerd
+}
+
+change_default_container_runtime() {
+  sed "0,/runc/s//nvidia/" "/etc/contained/config.toml" > "/etc/containerd/config.toml"
+}
 
 # update_host_ld_cache() {
 #   echo "Updating host's ld cache..."
