@@ -9,6 +9,7 @@ set -u
 set -x
 NVIDIA_DRIVER_BRANCH="XFree86"
 NVIDIA_DRIVER_VERSION="${NVIDIA_DRIVER_VERSION:-510.108.03}"
+NVIDIA_TOOLKIT_INSTALL="${NVIDIA_TOOLKIT_INSTALL:-true}"
 NVIDIA_DRIVER_DOWNLOAD_URL_DEFAULT="https://download.nvidia.com/${NVIDIA_DRIVER_BRANCH}/Linux-x86_64/${NVIDIA_DRIVER_VERSION}/NVIDIA-Linux-x86_64-${NVIDIA_DRIVER_VERSION}.run"
 NVIDIA_DRIVER_DOWNLOAD_URL="${NVIDIA_DRIVER_DOWNLOAD_URL:-$NVIDIA_DRIVER_DOWNLOAD_URL_DEFAULT}"
 NVIDIA_INSTALL_DIR_HOST="${NVIDIA_INSTALL_DIR_HOST:-/var/lib/nvidia}"
@@ -17,6 +18,9 @@ NVIDIA_INSTALLER_RUNFILE="$(basename "${NVIDIA_DRIVER_DOWNLOAD_URL}")"
 ROOT_MOUNT_DIR="${ROOT_MOUNT_DIR:-/root}"
 CACHE_FILE="${NVIDIA_INSTALL_DIR_CONTAINER}/.cache"
 KERNEL_VERSION="$(uname -r)"
+NVIDIA_TOOLKIT_LIB_URL="https://nvidia.github.io/libnvidia-container/gpgkey"
+NVIDIA_TOOLKIT_DOWNLOAD_URL="https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list"
+CONFIG_NVIDIA_CONTAINERD_DOWNLOAD_URL="https://raw.githubusercontent.com/fci-xplat/fke-config/main/config.toml"
 set +x
 
 check_cached_version() {
@@ -121,6 +125,25 @@ clean_nvidia_installation() {
   echo "Clean Nvidia installation... DONE."
 }
 
+install_nvidia_toolkit() {
+  echo "Add gpg key for NVIDIA-toolkit ..."
+  curl -fsSL ${NVIDIA_TOOLKIT_LIB_URL} | sudo gpg --batch --yes --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
+  curl -s -L ${NVIDIA_TOOLKIT_DOWNLOAD_URL} |
+  sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' |
+  sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+  echo "Installing NVIDIA-toolkit ..."
+  sudo apt-get update
+  sudo apt-get install -y nvidia-container-toolkit
+  sudo nvidia-ctk runtime configure --runtime=containerd
+  echo "Install NVIDIA-toolkit... DONE"
+}
+
+change_default_container_runtime() {
+  echo "Changing config default container runtime to nvidia..."
+  curl -Ls ${CONFIG_NVIDIA_CONTAINERD_DOWNLOAD_URL} > "/etc/containerd/config.toml"
+  echo "Change config container run time... DONE"
+  systemctl restart containerd
+}
 
 # update_host_ld_cache() {
 #   echo "Updating host's ld cache..."
@@ -139,6 +162,13 @@ main() {
     download_nvidia_installer
     run_nvidia_installer
     update_cached_version
+    if ${NVIDIA_TOOLKIT_INSTALL}; then
+      echo "Installing NVIDIA TOOLKIT..."
+      install_nvidia_toolkit
+      change_default_container_runtime
+    else
+      echo "Ignore NVIDIA TOOLKIT..."
+    fi
     verify_nvidia_installation
   fi
   clean_nvidia_installation
