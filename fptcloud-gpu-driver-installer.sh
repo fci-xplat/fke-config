@@ -20,7 +20,7 @@ CACHE_FILE="${NVIDIA_INSTALL_DIR_CONTAINER}/.cache"
 KERNEL_VERSION="$(uname -r)"
 NVIDIA_TOOLKIT_LIB_URL="https://nvidia.github.io/libnvidia-container/gpgkey"
 NVIDIA_TOOLKIT_DOWNLOAD_URL="https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list"
-CONFIG_NVIDIA_CONTAINERD_DOWNLOAD_URL="https://raw.githubusercontent.com/fci-xplat/fke-config/ADD/install-toolkit/config.toml"
+CONFIG_NVIDIA_CONTAINERD_DOWNLOAD_URL="https://raw.githubusercontent.com/fci-xplat/fke-config/main/config.toml"
 set +x
 
 check_cached_version() {
