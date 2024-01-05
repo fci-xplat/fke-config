@@ -169,6 +169,7 @@ main() {
     else
       echo "Ignore NVIDIA TOOLKIT..."
     verify_nvidia_installation
+    fi
   fi
   clean_nvidia_installation
   # update_host_ld_cache

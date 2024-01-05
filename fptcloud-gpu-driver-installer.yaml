@@ -58,7 +58,6 @@ spec:
           securityContext:
             privileged: true
             allowPrivilegeEscalation: true
-      restartPolicy: Never
       hostPID: true
       hostNetwork: true
       hostIPC: true
