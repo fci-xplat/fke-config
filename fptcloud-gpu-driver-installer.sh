@@ -138,7 +138,7 @@ install_nvidia_toolkit() {
 
 change_default_container_runtime() {
   echo "Changing config default container runtime to nvidia..."
-  sed "0,/runc/s//nvidia/" "/etc/contained/config.toml" > "/root/config.toml"
+  sed "0,/runc/s//nvidia/" "/etc/containerd/config.toml" > "/root/config.toml"
   rm /etc/containerd/config.toml
   mv /root/config.toml /etc/containerd/config.toml
   echo "Change config container run time... DONE"
