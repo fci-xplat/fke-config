@@ -124,17 +124,26 @@ clean_nvidia_installation() {
 }
 
 install_nvidia_toolkit() {
-  curl -fsSL ${NVIDIA_TOOLKIT_LIB_URL} | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
+  echo "Add gpg key for NVIDIA-toolkit ..."
+  curl -fsSL ${NVIDIA_TOOLKIT_LIB_URL} | sudo gpg --batch --yes --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
   curl -s -L ${NVIDIA_TOOLKIT_DOWNLOAD_URL} |
   sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' |
   sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+  echo "Installing NVIDIA-toolkit ..."
   sudo apt-get update
   sudo apt-get install -y nvidia-container-toolkit
   sudo nvidia-ctk runtime configure --runtime=containerd
+  echo "Install NVIDIA-toolkit... DONE"
 }
 
 change_default_container_runtime() {
-  sed "0,/runc/s//nvidia/" "/etc/contained/config.toml" > "/etc/containerd/config.toml"
+  echo "Changing config default container runtime to nvidia..."
+  sed "0,/runc/s//nvidia/" "/etc/contained/config.toml" > "/root/config.toml"
+  rm /etc/containerd/config.toml
+  mv /root/config.toml /etc/containerd/config.toml
+  echo "Change config container run time... DONE"
+  systemctl restart containerd
+  sudo reboot
 }
 
 # update_host_ld_cache() {
