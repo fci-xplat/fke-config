@@ -158,7 +158,7 @@ main() {
     #configure_cached_installation
     verify_nvidia_installation
     install_nvidia_toolkit
-    install_nvidia_toolkit
+    change_default_container_runtime
   else
     download_kernel_src
     configure_nvidia_installation_dirs
