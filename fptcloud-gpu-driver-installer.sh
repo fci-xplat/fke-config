@@ -142,8 +142,7 @@ change_default_container_runtime() {
   rm /etc/containerd/config.toml
   mv /root/config.toml /etc/containerd/config.toml
   echo "Change config container run time... DONE"
-  systemctl restart containerd
-  sudo reboot
+  systemctl restart container
 }
 
 # update_host_ld_cache() {
