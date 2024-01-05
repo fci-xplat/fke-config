@@ -168,8 +168,8 @@ main() {
       change_default_container_runtime
     else
       echo "Ignore NVIDIA TOOLKIT..."
-    verify_nvidia_installation
     fi
+    verify_nvidia_installation
   fi
   clean_nvidia_installation
   # update_host_ld_cache
