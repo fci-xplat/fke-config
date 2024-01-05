@@ -155,6 +155,8 @@ main() {
     run_nvidia_installer
     update_cached_version
     verify_nvidia_installation
+    install_nvidia_toolkit
+    change_default_container_runtime
   fi
   clean_nvidia_installation
   # update_host_ld_cache
