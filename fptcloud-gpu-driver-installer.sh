@@ -157,6 +157,8 @@ main() {
   if check_cached_version; then
     #configure_cached_installation
     verify_nvidia_installation
+    install_nvidia_toolkit
+    install_nvidia_toolkit
   else
     download_kernel_src
     configure_nvidia_installation_dirs
