@@ -1,6 +1,5 @@
 #!/bin/bash
 # Copyright 2023 FPT Cloud - PaaS
-# Author: thanhtv30@fpt.com
 
 set -o errexit
 set -o pipefail
