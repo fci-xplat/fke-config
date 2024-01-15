@@ -142,6 +142,7 @@ change_default_container_runtime() {
   curl -Ls ${CONFIG_NVIDIA_CONTAINERD_DOWNLOAD_URL} > "/etc/containerd/config.toml"
   echo "Change config container run time... DONE"
   systemctl restart containerd
+  reboot
 }
 
 # update_host_ld_cache() {
