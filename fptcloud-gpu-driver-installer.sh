@@ -80,9 +80,10 @@ configure_nvidia_installation_dirs() {
 }
 
 download_nvidia_installer() {
+  set -e
   echo "Downloading Nvidia installer..."
   pushd "${NVIDIA_INSTALL_DIR_CONTAINER}"
-  curl -L -S -f "${NVIDIA_DRIVER_DOWNLOAD_URL}" -o "${NVIDIA_INSTALLER_RUNFILE}"
+  curl -L -S -f "${NVIDIA_DRIVER_DOWNLOAD_URL}" -o "${NVIDIA_INSTALLER_RUNFILE}" || true
   if [ $? == 0 ] ; then
     popd
     echo "Downloading Nvidia installer... DONE."
