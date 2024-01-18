@@ -19,8 +19,10 @@ ROOT_MOUNT_DIR="${ROOT_MOUNT_DIR:-/root}"
 CACHE_FILE="${NVIDIA_INSTALL_DIR_CONTAINER}/.cache"
 KERNEL_VERSION="$(uname -r)"
 NVIDIA_TOOLKIT_LIB_URL="https://nvidia.github.io/libnvidia-container/gpgkey"
-NVIDIA_TOOLKIT_DOWNLOAD_URL="https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list"
-CONFIG_NVIDIA_CONTAINERD_DOWNLOAD_URL="https://raw.githubusercontent.com/fci-xplat/fke-config/main/config.toml"
+OS_DISTRIBUTION=$(. /etc/os-release;echo $ID$VERSION_ID)
+NVIDIA_TOOLKIT_DOWNLOAD_URL="https://nvidia.github.io/libnvidia-container/stable/${OS_DISTRIBUTION}/nvidia-container-toolkit.list"
+# NVIDIA_TOOLKIT_DOWNLOAD_URL="https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list"
+# CONFIG_NVIDIA_CONTAINERD_DOWNLOAD_URL="https://raw.githubusercontent.com/fci-xplat/fke-config/main/config.toml"
 set +x
 
 check_cached_version() {
@@ -143,17 +145,24 @@ install_nvidia_toolkit() {
   curl -s -L ${NVIDIA_TOOLKIT_DOWNLOAD_URL} |
   sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' |
   sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+
+  # curl -s -L ${NVIDIA_TOOLKIT_LIB_URL} | sudo apt-key add -
+  #curl -s -L https://nvidia.github.io/libnvidia-container/$distribution/libnvidia-container.list | sudo tee /etc/apt/sources.list.d/libnvidia-container.list
+  # curl -s -L ${NVIDIA_TOOLKIT_DOWNLOAD_URL} | sudo tee /etc/apt/sources.list.d/libnvidia-container.list
+  
   echo "Installing NVIDIA-toolkit ..."
   sudo apt-get update
   sudo apt-get install -y nvidia-container-toolkit
   sudo nvidia-ctk runtime configure --runtime=containerd
+  nvidia-ctk -v
   echo "Install NVIDIA-toolkit... DONE"
 }
 
 change_default_container_runtime() {
   echo "Changing config default container runtime to nvidia..."
-  curl -Ls ${CONFIG_NVIDIA_CONTAINERD_DOWNLOAD_URL} > "/etc/containerd/config.toml"
-  echo "Change config container run time... DONE"
+  # curl -Ls ${CONFIG_NVIDIA_CONTAINERD_DOWNLOAD_URL} > "/etc/containerd/config.toml"
+  sed -i 's\default_runtime_name = "runc"\default_runtime_name = "nvidia"\g' /etc/containerd/config.toml
+  echo "Change default runtime... DONE"
   systemctl restart containerd
 }
 
