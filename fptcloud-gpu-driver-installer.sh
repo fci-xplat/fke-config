@@ -10,6 +10,7 @@ NVIDIA_DRIVER_BRANCH="XFree86"
 NVIDIA_DRIVER_VERSION="${NVIDIA_DRIVER_VERSION:-510.108.03}"
 NVIDIA_TOOLKIT_INSTALL="${NVIDIA_TOOLKIT_INSTALL:-true}"
 NVIDIA_DRIVER_DOWNLOAD_URL_DEFAULT="https://download.nvidia.com/${NVIDIA_DRIVER_BRANCH}/Linux-x86_64/${NVIDIA_DRIVER_VERSION}/NVIDIA-Linux-x86_64-${NVIDIA_DRIVER_VERSION}.run"
+NVIDIA_DRIVER_DOWNLOAD_URL_SECOND="https://us.download.nvidia.com/tesla//${NVIDIA_DRIVER_VERSION}/NVIDIA-Linux-x86_64-${NVIDIA_DRIVER_VERSION}.run"
 NVIDIA_DRIVER_DOWNLOAD_URL="${NVIDIA_DRIVER_DOWNLOAD_URL:-$NVIDIA_DRIVER_DOWNLOAD_URL_DEFAULT}"
 NVIDIA_INSTALL_DIR_HOST="${NVIDIA_INSTALL_DIR_HOST:-/var/lib/nvidia}"
 NVIDIA_INSTALL_DIR_CONTAINER="${NVIDIA_INSTALL_DIR_CONTAINER:-/usr/local/nvidia}"
@@ -82,8 +83,16 @@ download_nvidia_installer() {
   echo "Downloading Nvidia installer..."
   pushd "${NVIDIA_INSTALL_DIR_CONTAINER}"
   curl -L -S -f "${NVIDIA_DRIVER_DOWNLOAD_URL}" -o "${NVIDIA_INSTALLER_RUNFILE}"
-  popd
-  echo "Downloading Nvidia installer... DONE."
+  if [ $? == 0 ] ; then
+    popd
+    echo "Downloading Nvidia installer... DONE."
+  else
+    NVIDIA_DRIVER_DOWNLOAD_URL="${NVIDIA_DRIVER_DOWNLOAD_URL:-$NVIDIA_DRIVER_DOWNLOAD_URL_SECOND}"
+    NVIDIA_INSTALLER_RUNFILE="$(basename "${NVIDIA_DRIVER_DOWNLOAD_URL}")"
+    curl -L -S -f "${NVIDIA_DRIVER_DOWNLOAD_URL}" -o "${NVIDIA_INSTALLER_RUNFILE}"
+    popd
+    echo "Downloading Nvidia installer... DONE."
+  fi
 }
 
 run_nvidia_installer() {
