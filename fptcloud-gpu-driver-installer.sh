@@ -84,7 +84,7 @@ download_nvidia_installer() {
   echo "Download Nvidia driver from $NVIDIA_DRIVER_DOWNLOAD_URL"
   pushd "${NVIDIA_INSTALL_DIR_CONTAINER}"
   curl -L -S -f "${NVIDIA_DRIVER_DOWNLOAD_URL}" -o "${NVIDIA_INSTALLER_RUNFILE}"
-  if [ -f "$NVIDIA_INSTALLER_RUNFILE" ]; then
+  if [[ -f "${NVIDIA_INSTALLER_RUNFILE}" ]]; then
     popd
     echo "Downloading Nvidia driver... DONE."
     set -e
