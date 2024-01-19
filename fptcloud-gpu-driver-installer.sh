@@ -21,7 +21,7 @@ KERNEL_VERSION="$(uname -r)"
 NVIDIA_TOOLKIT_LIB_URL="https://nvidia.github.io/libnvidia-container/gpgkey"
 OS_DISTRIBUTION=$(. /etc/os-release;echo $ID$VERSION_ID)
 NVIDIA_TOOLKIT_DOWNLOAD_URL="https://nvidia.github.io/libnvidia-container/stable/${OS_DISTRIBUTION}/nvidia-container-toolkit.list"
-NVIDIA_GPU_RESET="${NVIDIA_GPU_RESET:-false}"
+NVIDIA_GPU_RESET="${NVIDIA_GPU_RESET:-true}"
 # NVIDIA_TOOLKIT_DOWNLOAD_URL="https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list"
 # CONFIG_NVIDIA_CONTAINERD_DOWNLOAD_URL="https://raw.githubusercontent.com/fci-xplat/fke-config/main/config.toml"
 set +x
