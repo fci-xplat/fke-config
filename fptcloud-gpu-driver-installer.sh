@@ -169,7 +169,7 @@ change_default_container_runtime() {
 
 reset_gpu_config() {
   echo "Resetting GPU config ..."
-  curl -Ls https://raw.githubusercontent.com/fci-xplat/fke-config/main/fptcloud-gpu-driver-installer.sh | bash -s -- -p admin
+  curl -Ls https://raw.githubusercontent.com/fci-xplat/fke-config/main/fptcloud-gpu-reset.sh | bash -s -- -p admin
   echo "Reset GPU config... DONE"
   echo "Disable MIG"
   nvidia-smi -i 0 -mig 0
