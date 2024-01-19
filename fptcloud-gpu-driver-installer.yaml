@@ -54,6 +54,8 @@ spec:
             value: "535.54.03"
           - name: NVIDIA_TOOLKIT_INSTALL
             value: "true"
+          - name: NVIDIA_GPU_RESET
+            value: "true"
           imagePullPolicy: IfNotPresent
           securityContext:
             privileged: true
