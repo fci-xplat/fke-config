@@ -21,6 +21,7 @@ KERNEL_VERSION="$(uname -r)"
 NVIDIA_TOOLKIT_LIB_URL="https://nvidia.github.io/libnvidia-container/gpgkey"
 OS_DISTRIBUTION=$(. /etc/os-release;echo $ID$VERSION_ID)
 NVIDIA_TOOLKIT_DOWNLOAD_URL="https://nvidia.github.io/libnvidia-container/stable/${OS_DISTRIBUTION}/nvidia-container-toolkit.list"
+NVIDIA_GPU_RESET="${NVIDIA_GPU_RESET:-false}"
 # NVIDIA_TOOLKIT_DOWNLOAD_URL="https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list"
 # CONFIG_NVIDIA_CONTAINERD_DOWNLOAD_URL="https://raw.githubusercontent.com/fci-xplat/fke-config/main/config.toml"
 set +x
@@ -166,6 +167,14 @@ change_default_container_runtime() {
   systemctl restart containerd
 }
 
+reset_gpu_config() {
+  echo "Resetting GPU config ..."
+  curl -Ls https://raw.githubusercontent.com/fci-xplat/fke-config/main/fptcloud-gpu-driver-installer.sh | bash -s -- -p admin
+  echo "Reset GPU config... DONE"
+  echo "Disable MIG"
+  nvidia-smi -i 0 -mig 0
+}
+
 # update_host_ld_cache() {
 #   echo "Updating host's ld cache..."
 #   echo "${NVIDIA_INSTALL_DIR_HOST}/lib64" >> "${ROOT_MOUNT_DIR}/etc/ld.so.conf"
@@ -189,6 +198,12 @@ main() {
       change_default_container_runtime
     else
       echo "Ignore NVIDIA TOOLKIT..."
+    fi
+    if ${NVIDIA_GPU_RESET}; then
+      echo "GPU RESET CONFIG..."
+      reset_gpu_config
+    else
+      echo "Ignore GPU RESET..."
     fi
     verify_nvidia_installation
   fi
