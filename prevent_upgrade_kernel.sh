@@ -52,8 +52,10 @@ update_grub_config() {
 
 check_kernel_version() {
   dpkg -l | grep linux-image
-  apt-get update && apt-get install -y linux-headers-${KERNEL_VERSION}
-  echo "Downloading kernel sources... DONE."
+  uname -r
+  uname -a
+  echo "Kerbel version is:"
+  linux-image-$(uname -r)
 }
 
 main() {
