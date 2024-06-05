@@ -1,6 +1,5 @@
-// FPT Cloud - Kubenetes Engine Customize
 // Automatically upgrade packages from these (origin:archive) pairs
-//
+// FPT Cloud - Kubenetes Engine Customize
 // Note that in Ubuntu security updates may pull in new dependencies
 // from non-security sources (e.g. chromium). By allowing the release
 // pocket these get automatically pulled in.
