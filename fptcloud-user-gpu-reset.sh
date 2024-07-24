@@ -53,3 +53,6 @@ echo "- GPU remove modules: $module_status"
 echo "- GPU reset status: $reset_status"
 echo "- GPU MIG status: $mig_status"
 echo "GPU reset process finished"
+#reboot node to apply new mig config
+echo "this node will be rebooted to apply new MIG mode"
+reboot
