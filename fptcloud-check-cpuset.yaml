@@ -2,7 +2,7 @@
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-  name: fptcloud-gpu-check-cpuset
+  name: fptcloud-check-cpuset
   namespace: kube-system
   labels:
     k8s-app: cpuset
