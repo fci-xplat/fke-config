@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: fke-config-node
+spec:
+  selector:
+    matchLabels:
+      name: fke-config-node
+  template:
+    metadata:
+      labels:
+        name: fke-config-node
+    spec:
+      volumes:
+        - name: sysctl
+          hostPath:
+            path: /etc/sysctl.conf
+      initContainers:
+        - name: init
+          image: alpine:3.16.0
+          command:
+            - "/bin/sh"
+            - "-c"
+            - "echo fs.inotify.max_user_instances=8192 | tee -a /etc/sysctl.conf && echo fs.inotify.max_user_watches=524288 | tee -a /etc/sysctl.conf && sysctl -p"
+          volumeMounts:
+            - name: sysctl
+              mountPath: /etc/sysctl.conf
+          # securityContext:
+          #   allowPrivilegeEscalation: true
+          securityContext:
+            privileged: true
+            runAsUser: 0
+            runAsNonRoot: False
+      containers:
+        - name: pause
+          image: gcr.io/google_containers/pause
