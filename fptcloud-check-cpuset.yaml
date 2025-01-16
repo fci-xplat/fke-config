@@ -22,7 +22,7 @@ spec:
       tolerations:
       - operator: "Exists"
       containers:
-        - image: registry.fke.fptcloud.com/xplat-fke/alpine:3.13 #docker.io/alpine:3.13
+        - image: registry.fke.fptcloud.com/xplat-fke/alpine:3.13 ##docker.io/alpine:3.13
           name: check-cpuset
           command:
             - 'nsenter'
