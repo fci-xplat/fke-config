@@ -34,7 +34,6 @@ main() {
   else
     echo "No differences detected between the cpuset.cpus files."
     check_cpuset
-    sleep infinity
   fi
 }
 
