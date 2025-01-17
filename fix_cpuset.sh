@@ -13,6 +13,7 @@ check_cpuset() {
     echo $(cat /sys/fs/cgroup/cpuset/kubepods.slice/kubepods-besteffort.slice/cpuset.effective_cpus)
     echo $(cat /sys/fs/cgroup/cpuset/kubepods.slice/kubepods-burstable.slice/cpuset.cpus)
     echo $(cat /sys/fs/cgroup/cpuset/kubepods.slice/kubepods-burstable.slice/cpuset.effective_cpus)
+}
 
 fix_cpuset() {
     echo "Difference detected between the cpuset.cpus files."
