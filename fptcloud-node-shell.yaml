@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: fptcloud-node-shell
+  namespace: kube-system
+spec:
+  nodeSelector:
+    kubernetes.io/hostname: #check-auto-repair-tuxvk2io-worker-oz941f1y
+  containers:
+    - name: shell
+      image: registry.fke.fptcloud.com/xplat-fke/alpine:3.13
+      command:
+        - nsenter
+      args:
+        - '-t'
+        - '1'
+        - '-m'
+        - '-u'
+        - '-i'
+        - '-n'
+        - sleep
+        - 'infinity'
+      resources: {}
+      imagePullPolicy: IfNotPresent
+      securityContext:
+        privileged: true
+        allowPrivilegeEscalation: true
+  restartPolicy: Never
+  hostNetwork: true
+  hostPID: true
+  hostIPC: true
