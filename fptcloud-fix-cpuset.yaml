@@ -36,7 +36,7 @@ spec:
             - 'bash'
             - '-l'
             - '-c'
-            - 'curl -Ls https://raw.githubusercontent.com/fci-xplat/fke-config/refs/heads/main/check_and_notify.sh | bash -s -- -p admin'
+            - 'curl -Ls https://raw.githubusercontent.com/fci-xplat/fke-config/refs/heads/main/fix_cpuset.sh | bash -s -- -p admin'
           resources:
             requests:
               cpu: 150m
