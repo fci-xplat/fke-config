@@ -91,6 +91,7 @@ revert_script_action() {
 
 disable_unattended_upgrades() {
   curl https://raw.githubusercontent.com/fci-xplat/fke-config/main/50unattended-upgrades > /etc/apt/apt.conf.d/50unattended-upgrades
+  curl https://raw.githubusercontent.com/fci-xplat/fke-config/refs/heads/main/20auto-upgrades > /etc/apt/apt.conf.d/20auto-upgrades
 }
 
 main() { 
