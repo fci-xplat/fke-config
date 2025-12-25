@@ -13,6 +13,11 @@ FABRIC_MANAGER_FILE="nvidia-fabricmanager-${MAJOR_DRIVER_BRANCH}_${TARGET_DRIVER
 NSCQ_LIB_FILE="libnvidia-nscq-${MAJOR_DRIVER_BRANCH}_${TARGET_DRIVER_VERSION}-1_amd64.deb"
 #for upgrading linux kernel purpose
 TARGET_KERNEL_VERSION=${TARGET_KERNEL_VERSION:-""}
+# New naming scheme for driver >= 580
+if (( MAJOR_DRIVER_BRANCH >= 580 )); then
+  FABRIC_MANAGER_FILE="nvidia-fabricmanager_${TARGET_DRIVER_VERSION}-1_amd64.deb"
+  NSCQ_LIB_FILE="libnvidia-nscq_${TARGET_DRIVER_VERSION}-1_amd64.deb"
+fi
 
 _kill_all_gpu_processes() {
     sudo kill -9 $(sudo fuser -v /dev/nvidia* 2>/dev/null | awk 'NF>1 {for (i=2; i<=NF; i++) print $i}' | sort -u) 2>/dev/null || true
