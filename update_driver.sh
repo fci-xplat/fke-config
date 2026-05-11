@@ -53,7 +53,7 @@ _uninstall_driver() {
 
 _uninstall_fabricmanager() {
     echo "========== removing Fabric manager =========="
-    old_fabric_manager_service=$(dpkg -l "*fabric*" 2>/dev/null | awk '/^ii/ {print $2}' || true)
+    old_fabric_manager_service=$(dpkg -l "*fabric*" 2>/dev/null | awk '/^(ii|hi)/ {print $2}' || true)
     if dpkg -P $old_fabric_manager_service ; then
         echo "Fabric manager uninstalled sucessfully"
     else
